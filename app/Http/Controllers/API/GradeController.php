@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Models\Grade;
-use App\Http\Requests\API\StoreGradeRequest;
+use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 
 class GradeController extends Controller
 {
-    public function index(): JsonResponse
+    public function overallAverage(): JsonResponse
     {
-        $grades = Grade::with(['student', 'subject'])->get();
-        return response()->json($grades, 200);
+        $average = Grade::avg('grade');
+        return response()->json(['overall_average' => $average], 200);
     }
 
-    public function store(StoreGradeRequest $request): JsonResponse
+    public function averageByStudent(Student $student): JsonResponse
     {
-        $grade = Grade::create($request->validated());
-        return response()->json($grade, 201);
+        $average = $student->grades()->avg('grade');
+        return response()->json(['average' => $average], 200);
     }
 
-    public function show(Grade $grade): JsonResponse
+    public function averageBySubject(Subject $subject): JsonResponse
     {
-        $grade->load(['student', 'subject']);
-        return response()->json($grade, 200);
+        $average = $subject->grades()->avg('grade');
+        return response()->json(['average' => $average], 200);
     }
 }
